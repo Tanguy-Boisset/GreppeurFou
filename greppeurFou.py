@@ -26,7 +26,7 @@ print(f"""{col.INFO}
                                                                           by Sopalinge
 {col.ENDC}""")
 
-description = "This tool will try to find flags using the usual CTF{xxxxx} format of many CTF challenge"
+description = "This tool will try to find flags using the usual CTF{xxxxx} format of many CTF challenges"
 
 # Initialize parser
 parser = argparse.ArgumentParser(description = description)
@@ -34,7 +34,7 @@ parser = argparse.ArgumentParser(description = description)
 parser.add_argument("file", help = "file to inspect")
 parser.add_argument("flag_header", help = "first few characters of the flag")
 
-parser.add_argument("-v", "--verbose", help = "verbose output") # TODO
+parser.add_argument("-v", "--verbose", help = "verbose output", action="store_true") # TODO
 parser.add_argument("-r", "--recursive", help = "search recursively in a folder", action="store_true") # TODO
 parser.add_argument("-p", "--password", help = "try different techniques with a password") # TODO
 parser.add_argument("-d", "--delimiter", help = "delimiter for the flag (default : {})", default="{}")
@@ -63,10 +63,6 @@ def nonChangingChunk(flag, base):
     elif base == "base85":
         encoded = base64.b85encode(flag.encode()).decode('utf-8')
         return encoded[:-1]
-
-    
-        
-
 
 print(f"{col.HEADER}[*] Pre-calculating all flag formats{col.ENDC}")
 flag_format = {
@@ -119,7 +115,7 @@ def printSuccess(method, filename, line, line_number, decoded):
     {line[max(0,start-20):start]}{col.SUCCESS}{col.BOLD}{flag}{col.ENDC}{line[end:min(len(line)-1,end+20)]}\n""")
 
 # Open file
-print(f"{col.HEADER}[*] Looking for flags in {args.file}{col.ENDC}")
+print(f"{col.HEADER}[*] Looking for flags in {args.file}{col.ENDC}\n")
 
 try:
     file = open(args.file, 'rb')
