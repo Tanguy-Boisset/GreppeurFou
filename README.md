@@ -1,15 +1,15 @@
-# GreppeurFou
+# GreppeurFou - A CTF flag finder
 
 Ever tried to grep your way to victory in a CTF challenge by using the common prefix of the flags ?
 
-This tool does it for you but a lot more chance to find the flag by testing all sort of variations : encodings, encryption...
+This tool does it for you but with a lot more chance to find the flag by testing all sort of variations : encodings, encryption...
 
-It will also gather any usefull information that could lead your research : IP addresses, hashes, passwords...
+It will also gather any useful information that could lead your research : IP addresses, hashes, passwords...
 
 ## Basic usage
 
 Let's say you are part of a CTF where all flags follow some regex with a common prefix : `CTF{[A-Za-z0-9!?_]*}`\
-We can use this prefix to find the flag easily in a `challenge.data` file (or any other type of file), by testing all kinds of encodings for example.\
+You can use this prefix to find the flag easily in a `challenge.data` file (or any other type of file), by testing all kinds of encodings for example.\
 To do that, simply run :
 
 ```
