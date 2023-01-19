@@ -32,7 +32,7 @@ $ python3 greppeurFou.py challenge.data CTF
  / / __ / ___// _ \ / __ \ / __ \ / _ \ / / / // ___// /_   / __ \ / / / /
 / /_/ // /   /  __// /_/ // /_/ //  __// /_/ // /   / __/  / /_/ // /_/ / 
 \____//_/    \___// .___// .___/ \___/ \__,_//_/   /_/     \____/ \__,_/  
-                 /_/    /_/                                               v0.2
+                 /_/    /_/                                               v0.3
                                                                           by Sopalinge
 
 usage: greppeurFou.py [-h] [-v] [-r] [-p PASSWORD] [-d DELIMITER] file flag_header
