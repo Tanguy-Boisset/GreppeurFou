@@ -3,7 +3,6 @@
 import base64
 import argparse
 import binascii
-import glob
 import os
 
 # Print colors
@@ -118,18 +117,18 @@ def printSuccess(method, filename, line, line_number, decoded):
 
 if args.recursive:
     paths = []
-    root = args.file
-    if root[-1] != "/":
-        root += "/"
-    if not os.path.isdir(root):
-        print(f"{col.FAIL}[-] Option --recursive was used but {args.file} is not a folder{col.ENDC}\n")
+    root_folder = args.file
+    if root_folder[-1] == "/":
+        root_folder = root_folder[:-1]
+    if not os.path.isdir(root_folder):
+        print(f"{col.FAIL}[-] Option --recursive was used but {args.file} is not a folder or does not exist{col.ENDC}\n")
         exit(1)
-    for path in glob.iglob(root + '**', recursive=True):
-        if os.path.isfile(path):
-            paths.append(path)
+    for root, dirs, files in os.walk(root_folder):
+        for file in files:
+            paths.append(root + '/' + file)
 else:
     if not os.path.isfile(args.file):
-        print(f"{col.FAIL}[-] {args.file} is not a file. Use -r for a recursive search in a folder{col.ENDC}\n")
+        print(f"{col.FAIL}[-] {args.file} is not a file or does not exist. Use -r for a recursive search in a folder{col.ENDC}\n")
         exit(1)
     paths = [args.file]
 
