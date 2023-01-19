@@ -57,20 +57,21 @@ optional arguments:
 
 - [ ] Encodings
   - [x] Cleartext
-  - [ ] URL encoded
+  - [x] URL encoded
   - [ ] Octal
   - [x] Decimal
   - [x] Hexadecimal
   - [x] Base32
   - [x] Base64
-  - [ ] Base64 - URL proof
+  - [x] Base64 - URL proof
   - [x] Base85
+  - [ ] BaseXX - flag hidden in bigger text
   - [ ] Braille
   - [ ] Morse
-  - [ ] UTF-16
+  - [x] UTF-16
 - [ ] Encryption
   - [ ] XOR
-  - [ ] ROT13
+  - [x] ROT13
   - [ ] ROTxx
   - [ ] Vigenère
 - [ ] Info gathering
