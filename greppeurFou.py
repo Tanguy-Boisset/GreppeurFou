@@ -6,6 +6,8 @@ import binascii
 import os
 import urllib.parse as url
 import codecs
+import re
+from prettytable import PrettyTable
 
 # Print colors
 class col:
@@ -73,7 +75,7 @@ def nonChangingChunk(flag, base):
         encoded = base64.b85encode(flag.encode()).decode('utf-8')
         return encoded[:-1]
 
-print(f"{col.HEADER}[*] Pre-calculating all flag formats{col.ENDC}")
+print(f"{col.HEADER}[*] Pre-calculating all flag formats and compiling regex{col.ENDC}")
 flag_format = {
     "cleartext" : flag_start,
     "url" : url.quote(flag_start),
@@ -94,6 +96,36 @@ flag_format = {
     "utf-16" : flag_start,
     "rot13" : codecs.encode(flag_start, 'rot_13')
 }
+                            
+regex_dict = {
+    "ipv4" : {
+        "regex" : re.compile(r"(?:^|\b(?<!\.))(?:1?\d?\d|2[0-4]\d|25[0-5])(?:\.(?:1?\d?\d|2[0-4]\d|25[0-5])){3}(?=$|[^\w.])"),
+        "rslt" : {
+            #"example_ip" : {
+            #    "file1" : [12, 1367, 10983],
+            #    "file2" : [2],
+            #},
+        },
+    },
+    "url" : {
+        "regex" : re.compile(r'(((http|https|ftp)|mailto)[.:][^ >"\t]*|www\.[-a-z0-9.]+)'),
+        "rslt" : {},
+    },
+    "email" : {
+        "regex" : re.compile(r'\b[a-zA-Z0-9.#?$*_-]+@[a-zA-Z0-9.#?$*_-]+\.[a-zA-Z0-9.-]+\b'),
+        "rslt" : {},
+    },
+}
+
+def parseRegexRslt(rslt, name, filename, line_number):
+    for r in rslt:
+        try:
+            regex_dict[name]["rslt"][r][filename].append(line_number)
+        except KeyError:
+            try:
+                regex_dict[name]["rslt"][r][filename] = [line_number]
+            except:
+                regex_dict[name]["rslt"][r] = {filename: [line_number]}
 
 def extractFlag(line, flag, end_char):
     """
@@ -343,6 +375,22 @@ for filename in paths:
                     decoded = "ERROR"
                 printSuccess("ROT13", file.name, line, c, decoded)
             
+            ## Information gathering
+            # IPv4 Addresses
+            ipv4 = re.findall(regex_dict["ipv4"]["regex"], line)
+            parseRegexRslt(ipv4, "ipv4", file.name, c)
+
+            # URL
+            url_tmp = re.findall(regex_dict["url"]["regex"], line)
+            url_r = []
+            for r in url_tmp:
+                url_r.append(r[0])
+            parseRegexRslt(url_r, "url", file.name, c)
+
+            # Email addresses
+            email = re.findall(regex_dict["email"]["regex"], line)
+            parseRegexRslt(email, "email", file.name, c)
+                
 
     except KeyboardInterrupt:
         print(f"\n{col.WARNING}CTRL-C pressed. Exiting.{col.ENDC}\n")
@@ -350,3 +398,36 @@ for filename in paths:
         exit(0)
 
     file.close()
+
+## Tables from information gathering
+# TODO : truncate long tables
+# TODO : ask to store data in csv
+network_table = PrettyTable([])
+credz_table = PrettyTable([])
+hash_table = PrettyTable([])
+
+# Network table
+net_ipv4 = list(regex_dict["ipv4"]["rslt"].keys())
+net_url = list(regex_dict["url"]["rslt"].keys())
+
+row_nb_network = max(len(net_ipv4), len(net_url))
+
+network_table.add_column("IPv4 addresses", net_ipv4 + [''] * (row_nb_network - len(net_ipv4)))
+network_table.add_column("URL", net_url + [''] * (row_nb_network - len(net_url)))
+
+# Credz table
+credz_email = list(regex_dict["email"]["rslt"].keys())
+
+row_nb_credz = max(len(email), 0)
+
+credz_table.add_column("Email addresses", credz_email + [''] * (row_nb_credz - len(credz_email)))
+
+# Print tables
+print(f"{col.HEADER}Information gathered across all files :{col.ENDC}")
+print(f"{col.INFO}Network{col.ENDC}")
+print(network_table)
+print(f"\n{col.INFO}Credentials{col.ENDC}")
+print(credz_table)
+#print(hash_table)
+
+exit(0)

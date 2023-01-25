@@ -75,9 +75,14 @@ optional arguments:
   - [ ] ROTxx
   - [ ] Vigenère
 - [ ] Info gathering
-  - [ ] IP addresses
+  - [x] IP addresses
   - [ ] Hashes
-  - [ ] URL
+  - [x] URL
   - [ ] Domain names
   - [ ] Usernames
+  - [x] Emails
   - [ ] Passwords
+
+## Credits
+
+Regex & inspiration : https://github.com/piratesecurity/CTF-Capture-The-Flag-/blob/master/Grep%20Commands
