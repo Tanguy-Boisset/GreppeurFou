@@ -116,16 +116,22 @@ def printSuccess(method, filename, line, line_number, decoded):
     """
     Print with colors the results of the search if successful
     """
-    if decoded != "":
+    if decoded != "" and decoded != "ERROR":
         print(f"""{col.SUCCESS}[+] FLAG FOUND in {method} in {col.ENDC}\
 {col.SUCCESS}{col.UNDERLINE}{filename}{col.ENDC}{col.SUCCESS}, line {line_number}:{col.ENDC}\n\
     {line[max(0,start-20):start]}{col.GOOD}{col.BOLD}{flag}{col.ENDC}{line[end:min(len(line)-1,end+20)]}
     Decoded : {col.SUCCESS}{col.BOLD}{decoded}{col.ENDC}\n""")
 
-    else:
+    elif decoded == "":
         print(f"""{col.SUCCESS}[+] FLAG FOUND in {method} in {col.ENDC}\
 {col.SUCCESS}{col.UNDERLINE}{filename}{col.ENDC}{col.SUCCESS}, line {line_number}:{col.ENDC}\n\
     {line[max(0,start-20):start]}{col.SUCCESS}{col.BOLD}{flag}{col.ENDC}{line[end:min(len(line)-1,end+20)]}\n""")
+    
+    else:
+        print(f"""{col.SUCCESS}[+] FLAG FOUND in {method} in {col.ENDC}\
+{col.SUCCESS}{col.UNDERLINE}{filename}{col.ENDC}{col.SUCCESS}, line {line_number}:{col.ENDC}\n\
+    {line[max(0,start-20):start]}{col.SUCCESS}{col.BOLD}{flag}{col.ENDC}{line[end:min(len(line)-1,end+20)]}\n
+    {col.WARNING}[-] Unable to decode flag automatically - sorry, you're on your own for this part :({col.ENDC}\n""")
 
 # Build all files to check recursively
 if args.recursive:
@@ -171,103 +177,171 @@ for filename in paths:
             check = flag_format["url"]
             if check in line:
                 flag, start, end = extractFlag(line, check, url.quote(flag_end))
-                printSuccess("URL ENCODED", file.name, line, c, url.unquote(flag))
+                try:
+                    decoded = url.unquote(flag)
+                except:
+                    decoded = "ERROR"
+                printSuccess("URL ENCODED", file.name, line, c, decoded)
             
             # Flag in ascii (separator : space) ?
             check = flag_format["ascii_space"]
             if check in line:
                 flag, start, end = extractFlag(line, check, str(ord(flag_end)))
-                printSuccess("ASCII", file.name, line, c, ''.join(chr(int(char)) for char in flag.split(' ')))
+                try:
+                    decoded = ''.join(chr(int(char)) for char in flag.split(' '))
+                except:
+                    decoded = "ERROR"
+                printSuccess("ASCII", file.name, line, c, decoded)
             
             # Flag in ascii (separator : colon) ?
             check = flag_format["ascii_colon"]
             if check in line:
                 flag, start, end = extractFlag(line, check, str(ord(flag_end)))
-                printSuccess("ASCII", file.name, line, c, ''.join(chr(int(char)) for char in flag.split(':')))
+                try:
+                    decoded = ''.join(chr(int(char)) for char in flag.split(':'))
+                except:
+                    decoded = "ERROR"
+                printSuccess("ASCII", file.name, line, c, decoded)
             
             # Flag in ascii (separator : comma) ?
             check = flag_format["ascii_comma"]
             if check in line:
                 flag, start, end = extractFlag(line, check, str(ord(flag_end)))
-                printSuccess("ASCII", file.name, line, c, ''.join(chr(int(char)) for char in flag.split(',')))
+                try:
+                    decoded = ''.join(chr(int(char)) for char in flag.split(','))
+                except:
+                    decoded = "ERROR"
+                printSuccess("ASCII", file.name, line, c, decoded)
             
             # Flag in hex (separator : none) ?
             check = flag_format["hex_none"]
             if check in line:
                 flag, start, end = extractFlag(line, check, binascii.b2a_hex(flag_end.encode()).decode('utf-8', errors='ignore'))
-                printSuccess("HEX", file.name, line, c, binascii.a2b_hex(flag).decode('utf-8', errors='ignore'))
+                try:
+                    decoded = binascii.a2b_hex(flag).decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("HEX", file.name, line, c, decoded)
             
             # Flag in hex (separator : space) ?
             check = flag_format["hex_space"]
             if check in line:
                 flag, start, end = extractFlag(line, check, binascii.b2a_hex(flag_end.encode(), ' ').decode('utf-8', errors='ignore'))
-                printSuccess("HEX", file.name, line, c, binascii.a2b_hex(flag.replace(' ', '')).decode('utf-8', errors='ignore'))
+                try:
+                    decoded = binascii.a2b_hex(flag.replace(' ', '')).decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("HEX", file.name, line, c, decoded)
             
             # Flag in hex (separator : 0x) ?
             check = flag_format["hex_0x"]
             if check in line:
                 flag, start, end = extractFlag(line, check, ''.join([hex(ord(i)) for i in flag_end]))
-                printSuccess("HEX", file.name, line, c, binascii.a2b_hex(flag.replace('0x', '')).decode('utf-8', errors='ignore'))
+                try:
+                    decoded = binascii.a2b_hex(flag.replace('0x', '')).decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("HEX", file.name, line, c, decoded)
             
             # Flag in hex (separator : 0x + space) ?
             check = flag_format["hex_0x_space"]
             if check in line:
                 flag, start, end = extractFlag(line, check, ' '.join([hex(ord(i)) for i in flag_end]))
-                printSuccess("HEX", file.name, line, c, binascii.a2b_hex(flag.replace(' 0x', '')).decode('utf-8', errors='ignore'))
+                try:
+                    decoded = binascii.a2b_hex(flag.replace(' 0x', '')).decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("HEX", file.name, line, c, decoded)
             
             # Flag in hex (separator : \x) ?
             check = flag_format["hex_bsx"]
             if check in line:
                 flag, start, end = extractFlag(line, check, '\\x'.join([str(hex(ord(i)))[2:4] for i in flag_end]))
-                printSuccess("HEX", file.name, line, c, binascii.a2b_hex(flag.replace('\\x', '')).decode('utf-8', errors='ignore'))
+                try:
+                    decoded = binascii.a2b_hex(flag.replace('\\x', '')).decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("HEX", file.name, line, c, decoded)
 
             # Flag in hex (separator : \x + space) ?
             check = flag_format["hex_bsx_space"]
             if check in line:
                 flag, start, end = extractFlag(line, check, ' \\x'.join([str(hex(ord(i)))[2:4] for i in flag_end]))
-                printSuccess("HEX", file.name, line, c, binascii.a2b_hex(flag.replace(' \\x', '')).decode('utf-8', errors='ignore'))
+                try:
+                    decoded = binascii.a2b_hex(flag.replace(' \\x', '')).decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("HEX", file.name, line, c, decoded)
             
             # Flag in hex (separator : :) ?
             check = flag_format["hex_colon"]
             if check in line:
                 flag, start, end = extractFlag(line, check, binascii.b2a_hex(flag_end.encode(), ':').decode('utf-8', errors='ignore'))
-                printSuccess("HEX", file.name, line, c, binascii.a2b_hex(flag.replace(':', '')).decode('utf-8', errors='ignore'))
+                try:
+                    decoded = binascii.a2b_hex(flag.replace(':', '')).decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("HEX", file.name, line, c, decoded)
             
             # Flag in base64 ?
             check = flag_format["b64"]
             if check in line:
                 flag, start, end = extractFlag(line, check, ' ')
-                printSuccess("BASE64", file.name, line, c, base64.b64decode(flag+"==").decode('utf-8', errors='ignore'))
+                try:
+                    decoded = base64.b64decode(flag+"==").decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("BASE64", file.name, line, c, decoded)
             
             # Flag in base64 (URL proof) ?
             check = flag_format["b64_url"]
             if check in line:
                 flag, start, end = extractFlag(line, check, ' ')
-                printSuccess("BASE64", file.name, line, c, base64.urlsafe_b64decode(flag+"==").decode('utf-8', errors='ignore'))
+                try:
+                    decoded = base64.urlsafe_b64decode(flag+"==").decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("BASE64", file.name, line, c, decoded)
             
             # Flag in base32 ?
             check = flag_format["b32"]
             if check in line:
                 flag, start, end = extractFlag(line, check, ' ')
-                printSuccess("BASE32", file.name, line, c, base64.b32decode(flag).decode('utf-8', errors='ignore'))
+                try:
+                    decoded = base64.b32decode(flag).decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("BASE32", file.name, line, c, decoded)
             
             # Flag in base85 ?
             check = flag_format["b85"]
             if check in line:
                 flag, start, end = extractFlag(line, check, ' ')
-                printSuccess("BASE85", file.name, line, c, base64.b85decode(flag).decode('utf-8', errors='ignore'))
+                try:
+                    decoded = base64.b85decode(flag).decode('utf-8', errors='ignore')
+                except:
+                    decoded = "ERROR"
+                printSuccess("BASE85", file.name, line, c, decoded)
 
             # Flag in UTF-16 ?
             check = flag_format["utf-16"]
             if check in line.encode().decode('utf-16', errors='ignore'):
                 flag, start, end = extractFlag(line.encode().decode('utf-16', errors='ignore'), check, flag_end)
-                printSuccess("UTF-16", file.name, line, c, flag)
+                try:
+                    decoded = flag
+                except:
+                    decoded = "ERROR"
+                printSuccess("UTF-16", file.name, line, c, decoded)
 
             # Flag in ROT13 ?
             check = flag_format["rot13"]
             if check in line:
                 flag, start, end = extractFlag(line, check, codecs.encode(flag_end, 'rot_13'))
-                printSuccess("ROT13", file.name, line, c, codecs.encode(flag, 'rot_13'))
+                try:
+                    decoded = codecs.encode(flag, 'rot_13')
+                except:
+                    decoded = "ERROR"
+                printSuccess("ROT13", file.name, line, c, decoded)
             
 
     except KeyboardInterrupt:
